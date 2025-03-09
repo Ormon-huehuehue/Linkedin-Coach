@@ -70,8 +70,6 @@ const App = () => {
       const followersElement = document.querySelector('p a[href*="feed/followers"]') as HTMLElement;
       const followersCount = followersElement?.innerText.split(" ")[0];
 
-      console.log("Follwers and connections : ", followersCount, ", ", connectionsCount)
-
       if(followersCount && connectionsCount){ 
         updateFollowerAndConnectionCountInLocalStorage(Number(connectionsCount), Number(followersCount));
       }
@@ -96,9 +94,7 @@ const App = () => {
         });
       
         // Store data using chrome.storage.local
-        chrome.storage.local.set({ suggestedProfiles: profiles }, () => {
-          console.log("Profiles saved in Chrome storage:", profiles);
-        });
+        chrome.storage.local.set({ suggestedProfiles: profiles });
       }
       else {
         console.log("No suggested profiles found.");

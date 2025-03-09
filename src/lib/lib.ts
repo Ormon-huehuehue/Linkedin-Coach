@@ -221,8 +221,6 @@ export async function updateFollowerAndConnectionCountInLocalStorage(
       // Save back to storage
       await chrome.storage.local.set({ connectionData });
   
-      console.log("Saved data:", { connectionCount: connectionsCount, followersCount, timestamp });
-      
       return { connectionCount: connectionsCount, followersCount, timestamp };
     } catch (error) {
       console.error("Error saving connection count and timestamp:", error);
