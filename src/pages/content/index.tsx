@@ -142,10 +142,14 @@ const App = () => {
 
   
   const handleAiButtonClick = (event : FocusEvent)=>{
-   
-    const button = event.target as HTMLElement;
-    const textBox = button.closest(".comments-comment-box-comment__text-editor") as HTMLElement;
+   console.log("generating comment")
+    const btn = event.target as HTMLElement;
+    const button = btn?.closest(".ai-suggest-btn")
+
+    console.log("button :", button)
+    const textBox = button?.parentElement?.parentElement?.parentElement?.parentElement?.querySelector(".comments-comment-box-comment__text-editor") as HTMLElement;
     if(textBox){
+      console.log("Active textbox : ", textBox)
       setActiveTextBox(textBox);
     }
 
@@ -252,9 +256,13 @@ const App = () => {
       }
     }, 2000);
 
-      const aiIcon = activeTextBox.getElementsByClassName("ai-icon");
+    const iconsContainer = activeTextBox?.parentElement?.querySelector(".display-flex.justify-space-between")?.querySelector(".display-flex")
+      const aiIcon = iconsContainer?.getElementsByClassName("ai-icon");
+      //@ts-expect-error undefined error
       if (aiIcon.length > 0) {
-        aiIcon[0].remove(); // Remove the first AI button
+              //@ts-expect-error undefined error
+
+        aiIcon[0].remove();
       }
 
       setGeneratedComment(""); // Reset generated comment after insertion
