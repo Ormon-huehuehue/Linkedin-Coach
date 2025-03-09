@@ -25,6 +25,7 @@ This Chrome extension supercharges your LinkedIn experience with AI-powered feat
 1.  **Download the repository:**
     * Click the "Code" button and select "Download ZIP".
     * Extract the downloaded ZIP file to a local directory.
+    * Add environment variables : 
 2.  **Enable Developer Mode in Chrome:**
     * Open Chrome and navigate to `chrome://extensions`.
     * Toggle the "Developer mode" switch in the top right corner.

@@ -4,6 +4,7 @@ import { supabase } from '@src/utils/supabase/supabase';
 import { fetchDailyTasks } from '@src/lib/lib';
 import { useNavigate } from 'react-router-dom';
 import {motion} from "framer-motion"
+import SplashScreen from './SplashScreen';
 
 interface tasksProps {
     title: string;
@@ -15,6 +16,7 @@ interface tasksProps {
 const Tasks = () => {
     const [tasks, setTasks] = useState<tasksProps[] | null>(null);
     const [userLevel, setUserLevel] = useState<string | null>(null);
+    const [showSplashScreen, setShowSplashScreen] = useState<boolean>(localStorage.getItem("dailyTasks") ? false : true)
     const navigate = useNavigate();
 
 
@@ -58,8 +60,10 @@ const Tasks = () => {
                 const storedTasks = localStorage.getItem('dailyTasks');
                 if (storedTasks) {
                     setTasks(JSON.parse(storedTasks));
+                    setShowSplashScreen(false)
                 } else {
                     if(userLevel){
+                        setShowSplashScreen(true)
                         const response = await fetchDailyTasks(userLevel);
                         let cleanJson = response.slice(7, -4);
                         cleanJson = JSON.parse(cleanJson);
@@ -67,6 +71,7 @@ const Tasks = () => {
                         localStorage.setItem('dailyTasks', JSON.stringify(cleanJson));
                         //@ts-expect-error cleanJson type string not supported
                         setTasks(cleanJson);
+                        setShowSplashScreen(false)
                     }
                 }
             } catch (error) {
@@ -77,6 +82,13 @@ const Tasks = () => {
 
         loadTasks();
     }, [userLevel]);
+
+    // trigger splashscreen if tasks aren't ready yet
+    if(showSplashScreen){
+        return (
+            <SplashScreen onFinish={() => console.log("")} />
+        )
+    }
 
     return (
     <motion.div
@@ -96,7 +108,7 @@ const Tasks = () => {
                     contextualTips={task.contextualTips} 
                 />
             ))}
-        </motion.div>
+    </motion.div>
     );
 };
 

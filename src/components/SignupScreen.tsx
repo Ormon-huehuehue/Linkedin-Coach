@@ -58,6 +58,7 @@ const SignupScreen = () => {
       if(response.success){
         console.log("Response data :", response.data)
         setLoading(false)
+        navigate("/onboarding-survey")
       }
       // Redirect or show success message if needed
     } catch (err) {
@@ -137,7 +138,7 @@ const SignupScreen = () => {
             type="button"
             className="flex w-full justify-center rounded-md bg-linkedInBackground px-3 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-gray-700 focus-visible:outline-blueBackground cursor-pointer"
           >
-            Sign in with LinkedIn
+            Sign in witha LinkedIn
           </button> */}
         </form>
       </div>
