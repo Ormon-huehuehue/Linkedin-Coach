@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./style.css";
 import { addCommentToLocalStorage, addPostToLocalStorage, fetchGeminiSuggestion, updateFollowerAndConnectionCountInLocalStorage } from "@src/lib/lib";
-import browser from "webextension-polyfill";
 
 // Ensure we don't inject multiple root elements
 if (!document.getElementById("__react_root")) {
@@ -19,14 +18,44 @@ const root = createRoot(rootContainer);
 
 const App = () => {
   const [postData, setPostData] = useState<string | null>(null);
-  const [showModal, setShowModal] = useState(true);
   const [generatedComment, setGeneratedComment] = useState<string | null>(null);
   const [activeTextBox, setActiveTextBox] = useState<HTMLElement | null>(null);
-
- 
+  
+  const useURLChange = (callback: () => void) => {
+    useEffect(() => {
+      let lastUrl = window.location.href;
+  
+      const handleChange = () => {
+        if (window.location.href !== lastUrl) {
+          lastUrl = window.location.href;
+  
+          // Wait for the page to be fully loaded
+          if (document.readyState === "complete") {
+            callback();
+          } else {
+            const checkIfLoaded = setInterval(() => {
+              if (document.readyState === "complete") {
+                clearInterval(checkIfLoaded);
+                callback();
+              }
+            }, 500);
+          }
+        }
+      };
+  
+      // Run on initial load
+      handleChange();
+  
+      // Detect SPA-style URL changes
+      const observer = new MutationObserver(handleChange);
+      observer.observe(document, { subtree: true, childList: true });
+  
+      return () => observer.disconnect();
+    }, []);
+  };
+  
 
   const updateUserStats = async ()=>{
-    console.log("Updatiung user stats")
     const profileUrl = await chrome.storage.local.get("profileUrl");
 
     if(!profileUrl){
@@ -40,8 +69,12 @@ const App = () => {
       
       const followersElement = document.querySelector('p a[href*="feed/followers"]') as HTMLElement;
       const followersCount = followersElement?.innerText.split(" ")[0];
-      
-      updateFollowerAndConnectionCountInLocalStorage(Number(connectionsCount), Number(followersCount));
+
+      console.log("Follwers and connections : ", followersCount, ", ", connectionsCount)
+
+      if(followersCount && connectionsCount){ 
+        updateFollowerAndConnectionCountInLocalStorage(Number(connectionsCount), Number(followersCount));
+      }
 
 
 
@@ -57,7 +90,7 @@ const App = () => {
           const userName = (hiddenTextElements[0] as HTMLElement)?.innerText || "";
           const description = (hiddenTextElements[1] as HTMLElement)?.innerText || "";
 
-          console.log({ userName, description });
+          console.log("Suggested Profiles updated")
       
           return { imageElement, userName, description, profileLink };
         });
@@ -73,19 +106,16 @@ const App = () => {
     }
   }
 
-  useEffect(() => {
-   
-    updateUserStats();
-  }, []);
+  // useEffect(() => {
+  //   updateUserStats();
+  // }, []);
+
+  useURLChange(updateUserStats);
+
 
 
   const handleCommentButton = async (event: FocusEvent) => {
-    console.log("Comment button clicked")
-    //@ts-expect-error sendMessage type error
-    browser.runtime.sendMessage({ action: "addComment" },
-      ()=>console.log("Message sent")
-    );
-    
+    console.log("Comment button clicked")    
     const commentResponse = await addCommentToLocalStorage();
     console.log("Comment response", commentResponse);
   };
@@ -143,11 +173,14 @@ const App = () => {
         if (!(textBox as HTMLElement).dataset.listenerAdded) {
 
           if (!textBox.querySelector(".ai-icon")) {
+            const iconsContainer = textBox?.parentElement?.querySelector(".display-flex.justify-space-between")?.querySelector(".display-flex")
+
+
             const container = document.createElement("div");
             container.className = "ai-icon";
             container.setAttribute(
               "style",
-              "position: absolute; bottom: 0; right: 8rem; display: flex; align-items: center; justify-content: center; height: 100%; "
+              "display: flex; align-items: center; justify-content: center; height: 100%; "
             );
     
             const button = document.createElement("button");
@@ -159,7 +192,7 @@ const App = () => {
             button.addEventListener("click", handleAiButtonClick);
 
             container.appendChild(button);
-            textBox.appendChild(container);
+            iconsContainer?.appendChild(container);
           }
 
           

@@ -66,7 +66,7 @@ const questions = [
   },
   {
     id: "profileUrl",
-    question: "LinkedIn Profile URL",
+    question: "Please enter your LinkedIn profile URL. ( This needs to be accurate for your stats to update )",
     type: "text",
   },
 ];
@@ -105,7 +105,7 @@ export default function OnboardingSurvey() {
     const linkedInProfileUrl = answers["profileUrl"]; 
     if (email && userLevel && linkedInProfileUrl) {
       localStorage.setItem("profileUrl", linkedInProfileUrl);
-      await chrome.storage.local.set({ "profileUrl" : linkedInProfileUrl})
+      await chrome.storage.local.set({ profileUrl : linkedInProfileUrl})
       addUserToDatabase(email, userLevel, linkedInProfileUrl);
     } else {
       console.error("Couldn't quantify user, email or userLevel missing");
@@ -140,7 +140,7 @@ export default function OnboardingSurvey() {
             {questions[step].options?.map((option, index) => (
               <label
                 key={index}
-                className="flex items-center text-md text-[#302f2f] space-x-2 cursor-pointer px-2 py-4 border-2 border-[#efefef] rounded-lg hover:bg-gray-100"
+                className="flex items-center text-md text-headingText space-x-2 cursor-pointer px-2 py-4 border-2 border-[#efefef] rounded-lg hover:bg-gray-100"
               >
                 <input
                   type="radio"

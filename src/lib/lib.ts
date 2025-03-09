@@ -80,8 +80,8 @@ export async function fetchUserDivision(surveyResponse: string): Promise<string>
         );
 
         // Extract response correctly
-        const comment = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response from Gemini.";
-        return comment;
+        const level = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response from Gemini.";
+        return level;
         
     } catch (error) {
         console.error("Error fetching suggestion:", error);
@@ -144,8 +144,8 @@ Saturday (Content Creation & Planning - 1.5 Hours Total)
 
 Based on this SOP and give me tasks for a linkedIn user of level ${userLevel} ,
 feel free to deviate from the SOP a bit to make the tasks more engaging for the user, do not give similar tasks, every task should be different
-I need 3 DAILY tasks with contexual tips in the form of json
-All the 3 tasks should serve different purposes
+I need 5 DAILY tasks with contexual tips in the form of json
+All the 5 tasks should serve different purposes
 Each task should have a title, description, contextul tips and "isChecked" boolean which is "false" by deafault.
 The description should be very concise.
 I don't want you to give me any other message

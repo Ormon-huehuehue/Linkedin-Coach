@@ -27,7 +27,6 @@ export const getUserLevel = async (email : string)=>{
     console.error("Couldn't  user level, error:", error);
     return new Error(`Couldn't get user level: ${error.message}`);
   }
-  console.log("User level retrieved successfully: ", data);
   return data;
 }
 
@@ -40,7 +39,6 @@ export const getProfileUrl = async (email : string)=>{
     console.error("Couldn't  user level, error:", error);
     return new Error(`Couldn't get user level: ${error.message}`);
   }
-  console.log("User level retrieved successfully: ", data);
   return data;
 }
 
@@ -78,9 +76,10 @@ export async function signInUser(email: string, password: string) {
     console.log("Signin successful:", data);
 
     const profileUrl = await getProfileUrl(email);
+    const userLevel = await getUserLevel(email);
 
     //@ts-expect-error profileUrl is an array
-    await chrome.storage.local.set({"profileUrl" : profileUrl[0]?.linkedInUrl})
+    await chrome.storage.local.set({profileUrl : profileUrl[0]?.linkedInUrl})
 
     console.log("profile URL : ", profileUrl)
 

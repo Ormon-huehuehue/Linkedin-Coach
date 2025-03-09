@@ -35,6 +35,7 @@ const LoginScreen = () => {
       if (response.success) {
         console.log("Login successful:", response.data);
         setIsLoggedIn(true);
+        
       } else {
         setError("Login failed");
       }

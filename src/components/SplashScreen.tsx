@@ -3,10 +3,7 @@ import { useState, useEffect } from "react";
 
 const steps = [
   "Initializing...",
-  "Fetching tasks...",
-  "Processing data...",
-  "Finalizing...",
-  "Almost done...",
+  "Fetching tasks based on your assigned level...",
 ];
 
 const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
@@ -51,7 +48,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
             className="h-full bg-blue-600"
             initial={{ width: "0%" }}
             animate={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
-            transition={{ duration: 0.7, ease: "easeInOut" }}
+            transition={{ duration: 1.3, ease: "easeInOut" }}
           />
         </div>
       </motion.div>

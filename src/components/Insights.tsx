@@ -36,6 +36,7 @@ const Insights = () => {
   };
 
   return (
+  <>
     <motion.div
       key="insights"
       initial={{ opacity: 0, scaleY: 0.8, originY: 0 }}
@@ -87,6 +88,10 @@ const Insights = () => {
         <StatsGrid timeframe={selectedOption}/>
       </div>
     </motion.div>
+    <div className='px-7 pt-5 text-start '>
+        <p className='text-headingText'> <span className='text-headingText'> NOTE :</span> Please open your LinkedIn profile page in your browser to sync stats</p>
+    </div>
+  </>
   );
 };
 

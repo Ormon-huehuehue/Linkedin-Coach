@@ -43,14 +43,6 @@ const SignupScreen = () => {
     setError(null);
     
     try {
-      browser.runtime.sendMessage({
-        type: "SIGNUP",
-        email: email,
-        password: password
-      }).then((response) => {
-        console.log("content script response : ", response)
-      })
-
       const response = await signUpNewUser(email, password);
       
       console.log("Response : ", response)

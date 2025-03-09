@@ -36,21 +36,6 @@ const Topbar = () => {
 
   useEffect(() => {
     checkUser();
-
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data === 'checkUser') {
-        checkUser();
-      }
-      if (event.data === 'addComment') {
-        console.log('Add comment');
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
   }, [navigate, lastSyncTime]);
 
   const location = useLocation();

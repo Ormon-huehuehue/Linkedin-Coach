@@ -37,7 +37,7 @@ const TaskElement = ({ title, description, contextualTips, isChecked }: { title:
   return (
     <motion.div
       layout="position"
-      className="mx-5 bg-white shadow-lg rounded-lg px-3 py-2 border-2 border-[#efefef] cursor-pointer relative"
+      className="mx-5 bg-white shadow-sm rounded-lg px-3 py-2 border-2 border-[#efefef] cursor-pointer relative"
       onClick={handleClick}
     >
       <div className="flex flex-col gap-2">

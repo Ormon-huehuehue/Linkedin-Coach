@@ -57,28 +57,42 @@ const Tasks = () => {
     useEffect(() => {
         const loadTasks = async () => {
             try {
-                const storedTasks = localStorage.getItem('dailyTasks');
-                if (storedTasks) {
-                    setTasks(JSON.parse(storedTasks));
-                    setShowSplashScreen(false)
-                } else {
-                    if(userLevel){
-                        setShowSplashScreen(true)
-                        const response = await fetchDailyTasks(userLevel);
-                        let cleanJson = response.slice(7, -4);
-                        cleanJson = JSON.parse(cleanJson);
-                        
-                        localStorage.setItem('dailyTasks', JSON.stringify(cleanJson));
-                        //@ts-expect-error cleanJson type string not supported
-                        setTasks(cleanJson);
-                        setShowSplashScreen(false)
-                    }
+              const storedTasks = localStorage.getItem("dailyTasks");
+              const lastTasksGenerationTime = localStorage.getItem("taskGenerationTimestamp");
+              const now = Date.now();
+              const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+          
+              if (storedTasks && lastTasksGenerationTime) {
+                const lastGenTimestamp = parseInt(lastTasksGenerationTime, 10);
+          
+                // Only use stored tasks if they were generated within the last 24 hours
+                if (now - lastGenTimestamp < TWENTY_FOUR_HOURS) {
+                  setTasks(JSON.parse(storedTasks));
+                  setShowSplashScreen(false);
+                  return;
                 }
+              }
+          
+              // If no stored tasks or they are outdated, fetch new tasks
+              if (userLevel) {
+                setShowSplashScreen(true);
+                const response = await fetchDailyTasks(userLevel);
+                let cleanJson = response.slice(7, -4);
+                cleanJson = JSON.parse(cleanJson);
+          
+                localStorage.setItem("dailyTasks", JSON.stringify(cleanJson));
+                localStorage.setItem("taskGenerationTimestamp", String(now));
+                
+                //@ts-expect-error incorrect type
+                setTasks(cleanJson);
+                setShowSplashScreen(false);
+              }
             } catch (error) {
-                console.error("Error loading tasks:", error);
-                console.error("Check Gemini API key")
+              console.error("Error loading tasks:", error);
+              console.error("Check Gemini API key");
             }
-        };
+          };
+          
 
         loadTasks();
     }, [userLevel]);
@@ -98,7 +112,7 @@ const Tasks = () => {
         exit={{ opacity: 0, scaleY: 0 }}
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
         layout
-        className='h-full flex flex-col gap-3 mb-5'>
+        className='h-full flex flex-col gap-1 mb-5'>
             {tasks?.map((task, index) => (
                 <TaskElement 
                     key={index} 
