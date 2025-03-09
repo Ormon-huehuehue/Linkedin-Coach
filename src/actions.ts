@@ -24,7 +24,20 @@ export const getUserLevel = async (email : string)=>{
   .select('userLevel')
   .eq('email', email)
   if (error) {
-    console.error("Couldn't get user level, error:", error);
+    console.error("Couldn't  user level, error:", error);
+    return new Error(`Couldn't get user level: ${error.message}`);
+  }
+  console.log("User level retrieved successfully: ", data);
+  return data;
+}
+
+export const getProfileUrl = async (email : string)=>{
+  const { data, error } = await supabase
+  .from('users-data')
+  .select('linkedInUrl')
+  .eq('email', email)
+  if (error) {
+    console.error("Couldn't  user level, error:", error);
     return new Error(`Couldn't get user level: ${error.message}`);
   }
   console.log("User level retrieved successfully: ", data);
@@ -64,7 +77,12 @@ export async function signInUser(email: string, password: string) {
   
     console.log("Signin successful:", data);
 
+    const profileUrl = await getProfileUrl(email);
 
+    //@ts-expect-error profileUrl is an array
+    await chrome.storage.local.set({"profileUrl" : profileUrl[0]?.linkedInUrl})
+
+    console.log("profile URL : ", profileUrl)
 
     return { success: true, data }; // Return success response
   }

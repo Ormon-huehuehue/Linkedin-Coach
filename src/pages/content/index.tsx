@@ -28,6 +28,10 @@ const App = () => {
   const updateUserStats = async ()=>{
     console.log("Updatiung user stats")
     const profileUrl = await chrome.storage.local.get("profileUrl");
+
+    if(!profileUrl){
+      console.error("LinkedIn Profile Url not found in local Storage. Please login again")
+    }
     if (window.location.href.includes(profileUrl?.profileUrl)) {
       console.log("Updating follower count")
 
@@ -38,6 +42,8 @@ const App = () => {
       const followersCount = followersElement?.innerText.split(" ")[0];
       
       updateFollowerAndConnectionCountInLocalStorage(Number(connectionsCount), Number(followersCount));
+
+
 
       const suggestedProfilesList = Array.from(document.querySelectorAll(".pvs-header__left-container--stack")).find((el) => el.textContent?.trim().includes("People you may know"))?.closest(".pv-profile-card")?.querySelector("ul")?.querySelectorAll("li.artdeco-list__item");
 
