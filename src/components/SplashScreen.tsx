@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 
 const steps = [
   "Initializing...",
-  "Fetching tasks based on your assigned level...",
+  "Calculating level...",
+  "Fetching tasks...",
 ];
 
 const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {

@@ -18,6 +18,19 @@ export async function signUpNewUser(email: string, password: string) {
   return { success: true, data }; 
 }
 
+
+export const sendPasswordResetEmail = async (email: string) => {
+  const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+  if (error) {
+    console.error('Error sending reset email:', error.message);
+    return { success: false, message: error.message };
+  }
+  return { success: true, message: 'Password reset email sent!' }
+} 
+
+
+
 export const getUserLevel = async (email : string)=>{
   const { data, error } = await supabase
   .from('users-data')

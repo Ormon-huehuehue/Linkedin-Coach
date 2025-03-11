@@ -2,7 +2,7 @@ import { loginWithLinkedIn } from "@src/pages/background/handleLogin";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@src/utils/supabase/supabase";
 import { useNavigate } from "react-router-dom";
-import { signInUser } from "@src/actions";
+import { sendPasswordResetEmail, signInUser } from "@src/actions";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -46,6 +46,18 @@ const LoginScreen = () => {
       setLoading(false);
     }
   };
+
+  const handleForgotPassword = async()=>{
+    if(email){
+      const response = await sendPasswordResetEmail(email);
+      if(response.success){
+        console.log(response.message)
+      }
+      else{
+        console.log(response.message)
+      }
+    }
+  }
 
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-5 lg:px-8 border-2 border-grayBorder mx-5 my-5 rounded-xl">
@@ -102,24 +114,15 @@ const LoginScreen = () => {
             </button>
           </div>
 
-          <div className="text-center">
-            <a href="#" className="text-sm font-semibold text-grayText hover:text-headingText">
-              Forgot password?
-            </a>
-          </div>
 
           <hr className="my-6 border-gray-300" />
-
-          {/* <div>
-            <button
-              type="button"
-              className="flex w-full justify-center rounded-md bg-linkedInBackground px-3 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-gray-700 focus-visible:outline-blueBackground cursor-pointer"
-              onClick={loginWithLinkedIn}
-            >
-              Sign in with LinkedIn
-            </button>
-          </div> */}
         </form>
+
+          <div className="text-center">
+            <button className="text-sm font-semibold text-grayText hover:text-headingText" onClick={()=> handleForgotPassword()} disabled={!email}>
+              Forgot password?
+            </button>
+          </div>
       </div>
     </div>
   );

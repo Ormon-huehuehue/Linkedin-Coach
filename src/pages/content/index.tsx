@@ -62,7 +62,6 @@ const App = () => {
       console.error("LinkedIn Profile Url not found in local Storage. Please login again")
     }
     if (window.location.href.includes(profileUrl?.profileUrl)) {
-      console.log("Updating follower count")
 
       const connectionsElement = document.querySelector("li.text-body-small") as HTMLElement;
       const connectionsCount = connectionsElement?.innerText.split(" ")[0];
@@ -71,6 +70,7 @@ const App = () => {
       const followersCount = followersElement?.innerText.split(" ")[0];
 
       if(followersCount && connectionsCount){ 
+        console.log("updating follower and connection count")
         updateFollowerAndConnectionCountInLocalStorage(Number(connectionsCount), Number(followersCount));
       }
 
