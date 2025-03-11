@@ -23,24 +23,28 @@ const StatsGrid = ({timeframe} : {timeframe : string}) => {
         break;
     }
 
+    const updateStatsCount = async()=>{
+
+ 
+
     // Function to filter timestamps and count recent entries
     const filterRecent = (timestamps: string[]) =>
       timestamps.filter((ts) => new Date(ts).getTime() >= cutoffTime).length;
 
     // Fetch & filter comment timestamps
-    chrome.storage.local.get(["commentTimestamps"], (result) => {
+    await chrome.storage.local.get(["commentTimestamps"], (result) => {
       const timestamps = result.commentTimestamps || [];
       setCommentsPosted(filterRecent(timestamps));
     });
 
     // Fetch & filter post timestamps
-    chrome.storage.local.get(["postTimeStamps"], (result) => {
+    await chrome.storage.local.get(["postTimeStamps"], (result) => {
       const timestamps = result.postTimeStamps || [];
       setPostsPublished(filterRecent(timestamps));
     });
 
     // Fetch & calculate net gained followers and connections
-    chrome.storage.local.get(["connectionData"], (result) => {
+    await chrome.storage.local.get(["connectionData"], (result) => {
       const connectionData: { connectionCount: number; followersCount: number; timestamp: string }[] = 
         result.connectionData || [];
 
@@ -62,7 +66,12 @@ const StatsGrid = ({timeframe} : {timeframe : string}) => {
         setNewConnections(0);
         setNewFollowers(0);
       }
+
+
     });
+    }
+
+    updateStatsCount();
   }, [timeframe]);
 
   const stats = [

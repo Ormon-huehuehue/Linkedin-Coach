@@ -1,5 +1,5 @@
 import { loginWithLinkedIn } from "@src/pages/background/handleLogin";
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import { supabase } from "@src/utils/supabase/supabase";
 import { useNavigate } from "react-router-dom";
 import { sendPasswordResetEmail, signInUser } from "@src/actions";
@@ -35,7 +35,6 @@ const LoginScreen = () => {
       if (response.success) {
         console.log("Login successful:", response.data);
         setIsLoggedIn(true);
-        
       } else {
         setError("Login failed");
       }

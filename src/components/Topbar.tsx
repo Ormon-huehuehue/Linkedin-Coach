@@ -5,7 +5,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '@src/utils/supabase/supabase';
 import { syncLocalUserActivity } from '@src/lib/lib';
 
-const SYNC_INTERVAL = 60000*60*3; // 3 hours
+const SYNC_INTERVAL = 60000*1; //5 mins
 
 const Topbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);

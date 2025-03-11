@@ -81,6 +81,7 @@ export async function fetchUserDivision(surveyResponse: string): Promise<string>
 
         // Extract response correctly
         const level = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response from Gemini.";
+        chrome.storage.local.set({userLevel : level})
         return level;
         
     } catch (error) {
@@ -181,8 +182,11 @@ export async function addCommentToLocalStorage() {
         const result = await chrome.storage.local.get("commentTimestamps");
         let timestamps: string[] = result.commentTimestamps || [];
 
+        console.log("Old timestamps : ", timestamps)
+
         // Add new timestamp to the array
         timestamps.push(timestamp);
+        console.log("New timestamps : ", timestamps)
 
         // Save back to storage
         await chrome.storage.local.set({ commentTimestamps: timestamps });
@@ -255,8 +259,7 @@ export async function addPostToLocalStorage() {
 
 export async function syncLocalUserActivity(userId: string) {
     try {
-        
-
+        console.log("Syncing user stats with database")
         // Fetch local storage data
         const localData: any = await new Promise((resolve) =>
             chrome.storage.local.get(["commentTimestamps", "postTimeStamps", "connectionData"], resolve)
@@ -296,6 +299,12 @@ export async function syncLocalUserActivity(userId: string) {
             postTimeStamps: mergedPosts,
             connectionData: mergedConnectionsAndFollowers
         });
+
+        console.log({
+            "mergedComments": mergedComments,
+            "mergedPosts" : mergedPosts,
+            "mergedConnectionAndFollowers" : mergedConnectionsAndFollowers
+        })
 
         // 🏦 Update Supabase
         const { error: updateError } = await supabase

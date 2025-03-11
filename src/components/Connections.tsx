@@ -14,7 +14,6 @@ const Connections = () => {
   const setSuggestedProfiles = async () => {
     try {
       const { suggestedProfiles } = await chrome.storage.local.get("suggestedProfiles");
-      console.log("Profiles:", suggestedProfiles);
       setSuggestions(suggestedProfiles || []);
     } catch (error) {
       console.error("Error fetching suggested profiles:", error);

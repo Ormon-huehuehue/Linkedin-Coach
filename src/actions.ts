@@ -40,6 +40,8 @@ export const getUserLevel = async (email : string)=>{
     console.error("Couldn't  user level, error:", error);
     return new Error(`Couldn't get user level: ${error.message}`);
   }
+  console.log("getUserLevel : ", data)
+
   return data;
 }
 
@@ -52,6 +54,7 @@ export const getProfileUrl = async (email : string)=>{
     console.error("Couldn't  user level, error:", error);
     return new Error(`Couldn't get user level: ${error.message}`);
   }
+  console.log("getProfileUrl : ", data)
   return data;
 }
 
@@ -69,6 +72,9 @@ export const addUserToDatabase = async (email: string, userLevel : string, linke
     console.error("Couldn't add user to the database, error:", error);
     return new Error(`Couldn't add user to the database: ${error.message}`);
   }
+
+  await chrome.storage.local.set({profileUrl : linkedInUrl})
+  await chrome.storage.local.set({userLevel : userLevel})
 
   console.log("User added to the database successfully: ", data);
   return data; 
@@ -93,6 +99,9 @@ export async function signInUser(email: string, password: string) {
 
     //@ts-expect-error profileUrl is an array
     await chrome.storage.local.set({profileUrl : profileUrl[0]?.linkedInUrl})
+
+    //@ts-expect-error userLevel is an array
+    await chrome.storage.local.set({userLevel : userLevel[0]?.userLevel})
 
     console.log("profile URL : ", profileUrl)
 

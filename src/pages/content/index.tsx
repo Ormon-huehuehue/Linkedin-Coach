@@ -56,64 +56,83 @@ const App = () => {
   
 
   const updateUserStats = async ()=>{
+    console.log("Trying to update user stats")
     const profileUrl = await chrome.storage.local.get("profileUrl");
 
     if(!profileUrl){
       console.error("LinkedIn Profile Url not found in local Storage. Please login again")
     }
+
     if (window.location.href.includes(profileUrl?.profileUrl)) {
+      setTimeout(()=>{
+        const connectionsElement = document.querySelector("li.text-body-small") as HTMLElement;
+        const connectionsCount = connectionsElement?.innerText.split(" ")[0];
+        
+        const followersElement = document.querySelector('p a[href*="feed/followers"]') as HTMLElement;
+        const followersCount = followersElement?.innerText.split(" ")[0];
 
-      const connectionsElement = document.querySelector("li.text-body-small") as HTMLElement;
-      const connectionsCount = connectionsElement?.innerText.split(" ")[0];
-      
-      const followersElement = document.querySelector('p a[href*="feed/followers"]') as HTMLElement;
-      const followersCount = followersElement?.innerText.split(" ")[0];
-
-      if(followersCount && connectionsCount){ 
-        console.log("updating follower and connection count")
-        updateFollowerAndConnectionCountInLocalStorage(Number(connectionsCount), Number(followersCount));
-      }
+        if(followersCount && connectionsCount){ 
+          console.log("updating follower and connection count")
+          updateFollowerAndConnectionCountInLocalStorage(Number(connectionsCount), Number(followersCount));
+        }
 
 
 
-      const suggestedProfilesList = Array.from(document.querySelectorAll(".pvs-header__left-container--stack")).find((el) => el.textContent?.trim().includes("People you may know"))?.closest(".pv-profile-card")?.querySelector("ul")?.querySelectorAll("li.artdeco-list__item");
+        const suggestedProfilesList = Array.from(document.querySelectorAll(".pvs-header__left-container--stack")).find((el) => el.textContent?.trim().includes("People you may know"))?.closest(".pv-profile-card")?.querySelector("ul")?.querySelectorAll("li.artdeco-list__item");
 
-      if (suggestedProfilesList) {
-        const profiles = Array.from(suggestedProfilesList).map((profileEl) => {
-          const links = profileEl.querySelectorAll("a");
-          const profileLink = links[0].href;
-          const imageElement = links[0]?.outerHTML;
-          const hiddenTextElements = links[1]?.querySelectorAll('[aria-hidden="true"]');
+        if (suggestedProfilesList) {
+          const profiles = Array.from(suggestedProfilesList).map((profileEl) => {
+            const links = profileEl.querySelectorAll("a");
+            const profileLink = links[0].href;
+            const imageElement = links[0]?.outerHTML;
+            const hiddenTextElements = links[1]?.querySelectorAll('[aria-hidden="true"]');
 
-          const userName = (hiddenTextElements[0] as HTMLElement)?.innerText || "";
-          const description = (hiddenTextElements[1] as HTMLElement)?.innerText || "";
+            const userName = (hiddenTextElements[0] as HTMLElement)?.innerText || "";
+            const description = (hiddenTextElements[1] as HTMLElement)?.innerText || "";
 
-          console.log("Suggested Profiles updated")
-      
-          return { imageElement, userName, description, profileLink };
-        });
-      
-        // Store data using chrome.storage.local
-        chrome.storage.local.set({ suggestedProfiles: profiles });
-      }
-      else {
-        console.log("No suggested profiles found.");
-      }
+            console.log("Suggested Profiles updated")
+        
+            return { imageElement, userName, description, profileLink };
+          });
+        
+          // Store data using chrome.storage.local
+          chrome.storage.local.set({ suggestedProfiles: profiles });
+        }
+        else {
+          console.log("No suggested profiles found.");
+        }
+    }, 4000)
+    }
+    else{
+      console.log("Url doesnt match the profile url")
     }
   }
+
+  useURLChange(updateUserStats);
+
+  useEffect(() => {
+    const handleLoad = () => {
+      console.log("Page fully loaded. Running updateUserStats...");
+      updateUserStats();
+    };
+  
+    window.addEventListener("load", handleLoad);
+  
+    return () => {
+      window.removeEventListener("load", handleLoad);
+    };
+  }, []);
 
   // useEffect(() => {
   //   updateUserStats();
   // }, []);
 
-  useURLChange(updateUserStats);
 
 
 
   const handleCommentButton = async (event: FocusEvent) => {
-    console.log("Comment button clicked")    
     const commentResponse = await addCommentToLocalStorage();
-    console.log("Comment response", commentResponse);
+    console.log("Comment count updated :", commentResponse) 
   };
 
   const handlePostButton = async (event: MouseEvent) => {
@@ -132,25 +151,36 @@ const App = () => {
   };
 
   const fetchSuggestion = async () => {
-    if (postData) {
-      const response = await fetchGeminiSuggestion(postData);
-      console.log("Generated Comment:", response);
-      setGeneratedComment(response);
+
+    if(activeTextBox && postData){ 
+        const textArea = activeTextBox.getElementsByTagName("p");
+        
+        if (textArea.length > 0) {
+          textArea[0].textContent = ""; // Clear existing content
+          textArea[0].textContent =" Generating Comment .."
+        }
+        const response = await fetchGeminiSuggestion(postData);
+        setGeneratedComment(response);
     }
   };
 
 
   
   const handleAiButtonClick = (event : FocusEvent)=>{
-   console.log("generating comment")
     const btn = event.target as HTMLElement;
     const button = btn?.closest(".ai-suggest-btn")
 
-    console.log("button :", button)
     const textBox = button?.parentElement?.parentElement?.parentElement?.parentElement?.querySelector(".comments-comment-box-comment__text-editor") as HTMLElement;
     if(textBox){
-      console.log("Active textbox : ", textBox)
       setActiveTextBox(textBox);
+
+      const textArea = textBox.getElementsByTagName("p");
+
+      if (textArea.length > 0) {
+        textArea[0].textContent = ""; // Clear existing content
+        textArea[0].textContent =" Generating Comment ."
+      }
+      
     }
 
      // Find the nearest post container and extract the description
@@ -247,7 +277,7 @@ const App = () => {
 
       if (textArea.length > 0) {
         textArea[0].textContent = ""; // Clear existing content
-        textArea[0].textContent =" Generating Comment ...."
+        textArea[0].textContent =" Generating Comment ..."
       }
 
       setTimeout(() => {

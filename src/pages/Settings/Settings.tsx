@@ -29,10 +29,10 @@ export default function Settings() {
       if(userData){
         setEmail(userData.user?.email!)
       }
+      if(error){
+        setEmail("Error occured while fetching Email")
+      }
     }
-
-
-
     updateProfileFunction();
   },[])
 
