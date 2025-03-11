@@ -1,5 +1,5 @@
 import { loginWithLinkedIn } from "@src/pages/background/handleLogin";
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@src/utils/supabase/supabase";
 import { useNavigate } from "react-router-dom";
 import { sendPasswordResetEmail, signInUser } from "@src/actions";
@@ -10,6 +10,8 @@ const LoginScreen = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [forgotPasswordMessage, setForgotPasswordMessage] = useState<string | null>(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,7 +20,6 @@ const LoginScreen = () => {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
-     
         setIsLoggedIn(true);
         navigate("/home/Tasks");
       }
@@ -29,6 +30,7 @@ const LoginScreen = () => {
   const handleLogin = async () => {
     setLoading(true);
     setError(null);
+    setForgotPasswordMessage(null);
 
     try {
       const response = await signInUser(email, password);
@@ -46,17 +48,27 @@ const LoginScreen = () => {
     }
   };
 
-  const handleForgotPassword = async()=>{
-    if(email){
-      const response = await sendPasswordResetEmail(email);
-      if(response.success){
-        console.log(response.message)
-      }
-      else{
-        console.log(response.message)
-      }
+  const handleForgotPassword = async () => {
+    setForgotPasswordMessage(null);
+    setError(null);
+
+    if (!email) {
+      setForgotPasswordMessage("Please enter your email address.");
+      return;
     }
-  }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setForgotPasswordMessage("Please enter a valid email address.");
+      return;
+    }
+
+    const response = await sendPasswordResetEmail(email);
+    if (response.success) {
+      setForgotPasswordMessage("Password reset email sent successfully!");
+    } else {
+      setForgotPasswordMessage(response.message || "Failed to send reset email.");
+    }
+  };
 
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-5 lg:px-8 border-2 border-grayBorder mx-5 my-5 rounded-xl">
@@ -113,15 +125,25 @@ const LoginScreen = () => {
             </button>
           </div>
 
-
           <hr className="my-6 border-gray-300" />
         </form>
 
-          <div className="text-center">
-            <button className="text-sm font-semibold text-grayText hover:text-headingText" onClick={()=> handleForgotPassword()} disabled={!email}>
-              Forgot password?
-            </button>
+        <div className="text-center">
+          <button
+            className="text-sm font-semibold text-grayText hover:text-headingText"
+            onClick={handleForgotPassword}
+          >
+            Forgot password?
+          </button>
+        </div>
+
+        {forgotPasswordMessage && (
+          <div className='flex justify-center w-full'>
+          <p className={`mt-2 flex text-center text-sm ${forgotPasswordMessage.includes("successfully") ? "text-green-500" : "text-red-500"}`}>
+            {forgotPasswordMessage}
+          </p>
           </div>
+        )}
       </div>
     </div>
   );
