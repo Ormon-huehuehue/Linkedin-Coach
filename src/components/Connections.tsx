@@ -47,7 +47,10 @@ const Connections = () => {
             />
           ))
         ) : (
-          <p className="text-gray-500">No suggestions available.</p>
+          <div className='px-7 pt-5 text-center'>
+              <p className="text-gray-500 text-center">No suggestions available.</p>
+              <p className='text-headingText pt-10'> <span className='text-headingText'> NOTE :</span> Stats and Suggestions not updating? Make sure this URL matches your linkedIn Profile's URL</p>
+          </div>
         )}
       </div>
     </motion.div>

@@ -86,6 +86,13 @@ export default function Settings() {
         BACK TO HOME
       </Link>
 
+      <Link
+        to="/"
+        className="mt-4 px-6 py-2 rounded-lg font-medium transition duration-200 w-full bg-blue-500 hover:bg-blue-600 text-white"
+      >
+        Update Profile
+      </Link>
+
       <button
         onClick={handleSignOut}
         disabled={loading}

@@ -7,23 +7,13 @@ import HomeScreen from "@src/components/HomeScreen";
 import AccountScreen from "@src/components/AccountScreen";
 import { supabase } from "@src/utils/supabase/supabase";
 import OnboardingSurvey from "@src/components/OnboardingSurvey";
-
-
+import UpdateProfile from "@src/components/updateProfile";
 
 
 export default function Popup() {
-  const [apiKeyPresent, setApiKeyPresent] = useState<boolean>(false);
-
-
 
   useEffect(() => {
-    const checkApiKey = async () => {
-      const data = await browser.storage.local.get("GEMINI_API_KEY");
-      return data.GEMINI_API_KEY ? true : false;
-    };
-
-    checkApiKey().then(setApiKeyPresent);
-
+ 
     setInterval(() => {
       chrome.runtime.sendMessage({ keepAlive: true });
     }, 5000);
@@ -44,6 +34,7 @@ export default function Popup() {
           <Route path="/settings" element={<Settings />} />
           <Route path='/account/:method' element = {<AccountScreen/>} />
           <Route path="/onboarding-survey" element = {<OnboardingSurvey/>} />
+          <Route path="/update-profile" element = {<UpdateProfile/>} />
       </Routes>
     </Router>
   );
