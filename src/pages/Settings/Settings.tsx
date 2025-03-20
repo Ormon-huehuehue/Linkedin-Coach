@@ -31,6 +31,7 @@ export default function Settings() {
       }
       if(error){
         setEmail("Error occured while fetching Email")
+        navigate("/")
       }
     }
     updateProfileFunction();
@@ -87,7 +88,7 @@ export default function Settings() {
       </Link>
 
       <Link
-        to="/"
+        to="/update-profile"
         className="mt-4 px-6 py-2 rounded-lg font-medium transition duration-200 w-full bg-blue-500 hover:bg-blue-600 text-white"
       >
         Update Profile

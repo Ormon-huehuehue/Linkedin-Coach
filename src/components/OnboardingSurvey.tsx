@@ -88,7 +88,19 @@ export default function OnboardingSurvey() {
   };
 
   const handleChange = (value: string) => {
-    setAnswers({ ...answers, [questions[step].id]: value });
+    // If the current question is the LinkedIn profile URL question, validate it
+    if (questions[step].id === "profileUrl") {
+      const isValidLinkedInUrl = value.includes("linkedin.com/in/");
+      if (!isValidLinkedInUrl) {
+        // If the URL is invalid, set an error message
+        setAnswers({ ...answers, [questions[step].id]: value, error: "Please enter a valid LinkedIn profile URL." });
+      } else {
+        setAnswers({ ...answers, [questions[step].id]: value, error: "" });
+      }
+    } else {
+      // For other questions, just update the answer
+      setAnswers({ ...answers, [questions[step].id]: value });
+    }
   };
 
   const handleSubmit = async () => {
@@ -155,13 +167,17 @@ export default function OnboardingSurvey() {
             ))}
           </div>
         ) : (
-          <input
-            type="text"
-            placeholder="Enter your profile URL"
-            value={answers[questions[step].id] || ""}
-            onChange={(e) => handleChange(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md"
-          />
+          <div>
+            <input
+              type="text"
+              placeholder="Enter your profile URL"
+              value={answers[questions[step].id] || ""}
+              onChange={(e) => handleChange(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-md"
+            />
+            {/* Show error message if URL is invalid */}
+            {answers.error && <p className="text-red-500 mt-2">{answers.error}</p>}
+          </div>
         )}
       </motion.div>
   
@@ -177,11 +193,15 @@ export default function OnboardingSurvey() {
           </button>
           <button
             onClick={isLastStep ? handleSubmit : handleNext}
-            disabled={!answers[questions[step].id]}
+            disabled={
+              !answers[questions[step].id] ||
+              (questions[step].id === "profileUrl" && Boolean(answers.error))
+            }
             className="px-5 py-2 border rounded-md bg-blue-600 text-white disabled:opacity-50"
           >
             {isLastStep ? "Submit" : "Next"}
           </button>
+
         </div>
       </div>
     </div>

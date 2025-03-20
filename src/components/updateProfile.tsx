@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@src/utils/supabase/supabase";
 
@@ -6,70 +6,61 @@ export default function UpdateProfile() {
   const [profileUrl, setProfileUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"error" | "success" | "">(""); // To differentiate success/error messages
   const navigate = useNavigate();
 
-
-  const getUserLevel = async (email : string)=>{
-    const { data, error } = await supabase
-    .from('users-data')
-    .select('userLevel')
-    .eq('email', email)
-    if (error) {
-      console.error("Couldn't  user level, error:", error);
-      return new Error(`Couldn't get user level: ${error.message}`);
-    }
-    console.log("getUserLevel : ", data)
-  
-    return data;
-  }
-
-
- 
- 
-    
-
+  const isValidLinkedInUrl = (url: string) => {
+    return /^https:\/\/(www\.)?linkedin\.com\/.*$/.test(url);
+  };
 
   const handleUpdateProfileUrl = async () => {
-
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       const email = user.email;
- 
+
       if (!profileUrl.trim()) {
         setMessage("Profile URL cannot be empty.");
+        setMessageType("error");
         return;
       }
+      if (!isValidLinkedInUrl(profileUrl)) {
+        setMessage("Please enter a valid LinkedIn profile URL.");
+        setMessageType("error");
+        return;
+      }
+
       setLoading(true);
       setMessage("");
-  
+      setMessageType("");
+
       try {
         await chrome.storage.local.set({ profileUrl });
-        console.log("Updating linkedin url to ", profileUrl)
-  
+        console.log("Updating LinkedIn URL to", profileUrl);
+
         const { error } = await supabase
-        .from('users-data')
-        .update({linkedInUrl : profileUrl})
-        .eq('email', email)
+          .from("users-data")
+          .update({ linkedInUrl: profileUrl })
+          .eq("email", email);
+
         if (error) {
-          console.error("Couldn't  user level, error:", error);
-          return new Error(`Couldn't get user level: ${error.message}`);
-        }  
+          console.error("Couldn't update LinkedIn URL, error:", error);
+          setMessage("Failed to update profile URL.");
+          setMessageType("error");
+          return;
+        }
+
         setMessage("Profile URL updated successfully!");
+        setMessageType("success");
       } catch (error) {
         console.error("Update failed:", error);
         setMessage("Failed to update profile URL.");
+        setMessageType("error");
       } finally {
         setLoading(false);
       }
-
-
-
-
-    }
-    else{
+    } else {
       navigate("/account/login");
     }
-   
   };
 
   return (
@@ -80,12 +71,22 @@ export default function UpdateProfile() {
         <input
           type="text"
           value={profileUrl}
-          onChange={(e) => setProfileUrl(e.target.value)}
+          onChange={(e) => {
+            setProfileUrl(e.target.value);
+            if (isValidLinkedInUrl(e.target.value)) {
+              setMessage("");
+              setMessageType("");
+            }
+          }}
           className="border p-2 w-full rounded-lg"
           placeholder="Enter your LinkedIn URL"
         />
       </div>
-      {message && <p className="mt-2 text-red-500">{message}</p>}
+      {message && (
+        <p className={`mt-2 ${messageType === "error" ? "text-red-500" : "text-blue-500"}`}>
+          {message}
+        </p>
+      )}
       <button
         onClick={handleUpdateProfileUrl}
         disabled={loading}
@@ -101,9 +102,11 @@ export default function UpdateProfile() {
       >
         BACK TO SETTINGS
       </Link>
-      <div className='px-7 pt-5 text-start '>
-        <p className='text-headingText'> <span className='text-headingText'> NOTE :</span> Make sure this URL matches your linkedIn Profile's URL</p>
-    </div>
+      <div className="px-7 pt-5 text-start">
+        <p className="text-headingText">
+          <span className="text-headingText">NOTE:</span> Make sure this URL matches your LinkedIn profile's URL.
+        </p>
+      </div>
     </div>
   );
 }
